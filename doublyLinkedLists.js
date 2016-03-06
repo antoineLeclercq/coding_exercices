@@ -1,6 +1,6 @@
 (function (global) {
 
-    var DLL = function () {
+    var DLinkedList = function () {
         return new DoublyLinkedList();
     }
     
@@ -88,7 +88,6 @@
             if (this._size === 0) {
 
                 this.tail = this.head = newNode;
-                this._size++;
             } 
             else {
 
@@ -170,7 +169,7 @@
                 current = this.tail;
 
             // crawl until position reached
-            while (index > position) {
+            while (index >= position) {
 
                 next = current;
                 current = current.previous;
@@ -210,12 +209,7 @@
                     return this._insertFromLeft(newNode, position);
                 } 
                 else {
-
-                    // if position is tail, set tail equal to newNode
-                    if (position === this._size) {
-                        return this.insertRight(data);
-                    }
-
+                    
                     // insert node by crawling from end
                     return this._insertFromRight(newNode, position);
                 }
@@ -321,31 +315,54 @@
                 previous;
 
             if (this._size > 0) {
-
-                // if head contains data, delete head
-                if (data === current.data) {
-
-                    this.head = current.next;
-                    this._size--;
-
-                    return true;
-                } 
+                
+                if (this._size === 1) {
+                    
+                    // delete head and tail
+                    if ( data === current.data) {
+                        this.head = this.tail = null;
+                        
+                        this._size--;
+                        return true;
+                    }
+                }
                 else {
+                    
+                    // if head contains data, delete head
+                    if (data === this.head.data) {
 
-                    // crawl thorugh list until data is found and delete the node cointaining it
-                    for (var i = 1; i < this._size - 1; i++) {
+                        this.head = this.head.next;
+                        this.head.previous = null;
+                        
+                        this._size--;
+                        return true;
+                    } 
+                    // if tail contains data, delete data
+                    else if (data === this.tail.data) {
+                        
+                        this.tail = this.tail.previous;
+                        this.tail.next = null;
+                        
+                        this._size--;
+                        return true;
+                    }
+                    else {
 
-                        previous = current;
-                        current = current.next;
-                        next = current.next;
+                        // crawl thorugh list , excluding head and tail, until data is found and delete the node cointaining it
+                        for (var i = 1; i < this._size - 1; i++) {
 
-                        if (data === current.data) {
+                            previous = current;
+                            current = current.next;
+                            next = current.next;
 
-                            previous.next = next;
-                            next.previous = previous;
-                            this._size--;
+                            if (data === current.data) {
 
-                            return true;
+                                previous.next = next;
+                                next.previous = previous;
+                                
+                                this._size--;
+                                return true;
+                            }
                         }
                     }
                 }
@@ -362,12 +379,14 @@
                 string = '';
 
             // crawl through every nodes, appending each data to string
-            while (current) {
+            while (current.next) {
 
                 string += (current.data + ',');
                 current = current.next;
             }
-
+            
+            string += (current.data);
+            
             return string;
         },
 
@@ -378,12 +397,14 @@
                 string = '';
 
             // crawl through every nodes, appending each data to string
-            while (current) {
+            while (current.previous) {
 
                 string += (current.data + ',');
                 current = current.previous;
             }
 
+            string += (current.data);
+            
             return string;
         },
 
@@ -400,6 +421,6 @@
         }
     };
     
-    global.DLL = DLL;
+    global.DLinkedList = DLinkedList;
     
 }(window));
