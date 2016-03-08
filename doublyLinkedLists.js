@@ -201,6 +201,7 @@
                         current,
                         next;
                     
+                    // if action is to insert, declare a newNode with `data`
                     if (action === 'insert') {
                         newNode = new this.Node(data);
                     }
@@ -208,25 +209,31 @@
                     // if position is in first half of list
                     if (position <= middle) {
 
-                        // if position is 1, set head equal to newNode
                         if (position === 1) {
+                            
                             if (action === 'insert') {
+                                // set head equal to new node
                                 return this.insertLeft(data);
                             }
 
                             if (action === 'delete') {
+                                // delete head
                                 return this.deleteLeft();
                             }
                         }
-
+                        
+                        // declare current by finding it searching from the left
                         current = this._searchFromLeft(position);
                     } 
+                    // if position in second half of list
                     else {
                         
+                        // if position is tail's position and action is to delete, delete tail
                         if (position === this._size && action === 'delete') {
                             return this.deleteRight();
                         }
                         
+                        // declare current by finding it seach from the right
                         current = this._searchFromRight(position);
                     }
 
@@ -387,12 +394,15 @@
             this._size = 0;
         },
         
+        // swap element at positionLeft with element at positionRight, assuming the fact that positions
+        // are opposites when taking the middle of the list as separation
         _swap: function (positionLeft, positionRight) {
             
             var positions = {Left: positionLeft, Right: positionRight},
                 positionKeys = Object.keys(positions),
                 container = {};
             
+            // create properties for left and right node being swapped
             for (var i = 0; i < positionKeys.length; i++) {
                 
                 var side = positionKeys[i];
@@ -402,20 +412,24 @@
                 container['next' + side] = container['current' + side].next;
             }
             
+            // if left node is not head
             if (container.previousLeft !== null) {
                 container.previousLeft.next = container.currentRight;
             }
             
+            // if right node is not tail
             if (container.nextRight !== null) {
                 container.nextRight.previous = container.currentLeft;
             }
             
+            // if left node and right node are head and tail
             if (container.previousLeft === null && container.nextRight === null) {
                 
                 this.head  = container.currentRight;
                 this.tail = container.currentLeft;
             }
-
+            
+            // if left node and right node are next to each other
             if (container.currentLeft === container.previousRight && container.currentRight === container.nextLeft) {
 
                 container.currentLeft.previous = container.currentRight;
@@ -429,16 +443,18 @@
                 container.nextLeft.previous = container.currentRight;
                 container.previousRight.next = container.currentLeft;
             }
-
+            
             container.currentLeft.next = container.nextRight;
             container.currentRight.previous = container.previousLeft;
         },
         
+        // reverse the list
         reverse: function () {
             
             var indexLeft = 1,
                 indexRight = this._size;
             
+            // keep swapping elements until indexLeft and indexRight are equal
             while (indexLeft < indexRight) {
                 
                 this._swap(indexLeft, indexRight);
