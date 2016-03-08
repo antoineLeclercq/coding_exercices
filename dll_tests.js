@@ -1,4 +1,5 @@
 (function () {
+    
     function assert (condition, message) {
     
         if (condition) {
@@ -9,21 +10,21 @@
     function assertEqual (reference, value) {
 
         if (reference !== value) {
-
             throw new Error(reference + ' !== ' + value);
         }
     }
     
-    function assertError(statement, errorMessage) {
+    function assertThrowsError(statement, errorMessage) {
         
         try {
-            eval(statement);
+            statement();
         } catch (error) {
+            
             if(error.toString().search(errorMessage) > -1) {
                 return;
             } 
             else {
-                throw new Error('Error should be trown');
+                throw new Error('Different error should be trown.\nCurrent ' + error);
             }
         }
     }
@@ -59,8 +60,6 @@
             assertEqual(dLinkedList.head.next.data, 3);
             assertEqual(dLinkedList.tail.previous.data, 3);
             assertEqual(dLinkedList._size, 3);
-            
-            console.log('insertLeftTest OK');
         },
         
         insertRightTest: function () {
@@ -85,8 +84,6 @@
             assertEqual(dLinkedList.head.next.data, 3);
             assertEqual(dLinkedList.tail.previous.data, 3);
             assertEqual(dLinkedList._size, 3);
-            
-            console.log('insertRightTest OK');
         },
         
         deleteLeftTest: function () {
@@ -119,8 +116,6 @@
             assertEqual(dLinkedList._size, 0);
             assertEqual(dLinkedList.head, null);
             assertEqual(dLinkedList.tail, dLinkedList.head);
-            
-            console.log('deleteLeftTest OK');
         },
         
         deleteRightTest: function () {
@@ -153,17 +148,26 @@
             assertEqual(dLinkedList._size, 0);
             assertEqual(dLinkedList.head, null);
             assertEqual(dLinkedList.tail, dLinkedList.head);
+        },
+        
+        seachAtTest: function (position) {
             
-            console.log('deleteRight OK');
+            var dLinkedList = new DLinkedList();
+            
+            for (var i = 0; i < 3; i++) {
+                
+                dLinkedList.insertRight(i);
+                assertEqual(dLinkedList.searchAt(i + 1).data, i);
+            }
         },
         
         insertAtTest: function () {
             
             var dLinkedList = DLinkedList();
             
-            assertError.call(dLinkedList,'this.insertAt(0, 10);','Position out of bounds');
-            assertError.call(dLinkedList,'this.insertAt(1, 10);','Position out of bounds');
-            assertError.call(dLinkedList,'this.insertAt(2, 10);','Position out of bounds');
+            assertThrowsError(function () {dLinkedList.insertAt(0, 10);},'Position out of bounds');
+            assertThrowsError(function () {dLinkedList.insertAt(1, 10);},'Position out of bounds');
+            assertThrowsError(function () {dLinkedList.insertAt(2, 10);},'Position out of bounds');
             
             dLinkedList.insertLeft(5);
             dLinkedList.insertAt(1,10);
@@ -171,7 +175,7 @@
             assertEqual(dLinkedList.head.data, 10);
             assertEqual(dLinkedList.tail.data, 5);
             
-            assertError.call(dLinkedList,'this.insertAt(3, 20);','Position out of bounds');
+            assertThrowsError(function () {dLinkedList.insertAt(3, 20);},'Position out of bounds');
             
             dLinkedList.insertAt(2,20);
             assertEqual(dLinkedList._size, 3);
@@ -184,17 +188,15 @@
             assertEqual(dLinkedList.head.data, 10);
             assertEqual(dLinkedList.tail.data, 5);
             assertEqual(dLinkedList.tail.previous.data, 8);
-            
-            console.log('insertAt OK');
         },
         
         deleteAtTest: function () {
             
             var dLinkedList = DLinkedList();
             
-            assertError.call(dLinkedList,'this.deleteAt(0);','Position out of bounds');
-            assertError.call(dLinkedList,'this.deleteAt(1);','Position out of bounds');
-            assertError.call(dLinkedList,'this.deleteAt(2);','Position out of bounds');
+            assertThrowsError(function () {dLinkedList.deleteAt(0);},'Position out of bounds');
+            assertThrowsError(function () {dLinkedList.deleteAt(1);},'Position out of bounds');
+            assertThrowsError(function () {dLinkedList.deleteAt(2);},'Position out of bounds');
             
             
             for (var i = 0; i < 3; i++) {
@@ -202,7 +204,7 @@
                 dLinkedList.insertRight(i);
             }
             
-            assertError.call(dLinkedList,'this.deleteAt(4);','Position out of bounds');
+            assertThrowsError(function () {dLinkedList.deleteAt(4);},'Position out of bounds');
             
             dLinkedList.deleteAt(2);
             assertEqual(dLinkedList._size, 2);
@@ -218,21 +220,19 @@
             assertEqual(dLinkedList.head, dLinkedList.tail);
             
             
-            assertError.call(dLinkedList,'this.deleteAt(2);','Position out of bounds');
+            assertThrowsError(function () {dLinkedList.deleteAt(2);},'Position out of bounds');
             
             dLinkedList.deleteAt(1);
             assertEqual(dLinkedList._size, 0);
             assertEqual(dLinkedList.head, null);
             assertEqual(dLinkedList.tail, dLinkedList.head);
-            
-            console.log('deleteAt OK');
         },
         
         deleteNodeTest: function () {
             
             var dLinkedList = DLinkedList();
             
-            assertError.call(dLinkedList,'this.deleteNode(0);','The specified node was not found');
+            assertThrowsError(function () {dLinkedList.deleteNode(0);},'The specified node was not found');
             
             
             for (var i = 0; i < 3; i++) {
@@ -240,25 +240,26 @@
                 dLinkedList.insertRight(i);
             }
             
-            assertError.call(dLinkedList,'this.deleteNode(5);','The specified node was not found');
+            assertThrowsError(function () {dLinkedList.deleteNode(5);},'The specified node was not found');
             
             dLinkedList.deleteNode(1);
+            assertEqual(dLinkedList._size, 2);
             assertEqual(dLinkedList.head.data, 0);
             assertEqual(dLinkedList.tail.data, 2);
             assertEqual(dLinkedList.head.next.data, dLinkedList.tail.data);
             
             dLinkedList.deleteNode(2);
+            assertEqual(dLinkedList._size, 1);
             assertEqual(dLinkedList.head.data, 0);
             assertEqual(dLinkedList.head.data, dLinkedList.tail.data);
             
             
-            assertError.call(dLinkedList,'this.deleteNode(2);','The specified node was not found');
+            assertThrowsError(function () {dLinkedList.deleteNode(2);},'The specified node was not found');
             
             dLinkedList.deleteNode(0);
+            assertEqual(dLinkedList._size, 0);
             assertEqual(dLinkedList.head, null);
             assertEqual(dLinkedList.tail, dLinkedList.head);
-            
-            console.log('deleteNode OK');
         },
         
         displayForwardTest: function () {
@@ -271,6 +272,7 @@
             }
             
             assertEqual(dLinkedList.displayForward(), '0,1,2')
+            assertEqual(dLinkedList._size, 3);
         },
         
         displayBackwardTest: function () {
@@ -283,18 +285,20 @@
             }
             
             assertEqual(dLinkedList.displayBackward(), '2,1,0')
+            assertEqual(dLinkedList._size, 3);
         },
         
         getSizeTest: function () {
             
             var dLinkedList = DLinkedList();
             
+            assertEqual(dLinkedList.getSize(), 0);
+            
             for (var i = 0; i < 3; i++) {
                 
                 dLinkedList.insertRight(i);
+                assertEqual(dLinkedList.getSize(), i + 1);
             }
-            
-            assertEqual(dLinkedList.getSize(), 3);
         },
         
         clearTest: function () {
@@ -307,8 +311,46 @@
             }
             
             dLinkedList.clear();
+            assertEqual(dLinkedList._size, 0);
             assertEqual(dLinkedList.head, null);
             assertEqual(dLinkedList.tail, dLinkedList.head);
+        },
+        
+        reverseTest: function () {
+            
+            var dLinkedList = DLinkedList();
+            
+            for (var i = 0; i < 6; i++) {
+                
+                dLinkedList.insertRight(i);
+            }
+            
+            dLinkedList.reverse();
+            assertEqual(dLinkedList._size, 6);
+            assertEqual(dLinkedList.displayForward(), '5,4,3,2,1,0');
+            
+            
+            dLinkedList.clear();
+            
+            for (var i = 0; i < 3; i++) {
+                
+                dLinkedList.insertRight(i);
+            }
+            
+            dLinkedList.reverse();
+            assertEqual(dLinkedList._size, 3);
+            assertEqual(dLinkedList.displayForward(), '2,1,0');
+            
+            dLinkedList.clear();
+            
+            for (var i = 0; i < 2; i++) {
+                
+                dLinkedList.insertRight(i);
+            }
+            
+            dLinkedList.reverse();
+            assertEqual(dLinkedList._size, 2);
+            assertEqual(dLinkedList.displayForward(), '1,0');
         }
     }
     
@@ -316,8 +358,15 @@
     
     for (var i = 0; i < unitTestsMethods.length; i++) {
         
-         unitTests[unitTestsMethods[i]]();
+        try {
+            unitTests[unitTestsMethods[i]]();
+            console.log(unitTestsMethods[i] + ' OK');
+        }
+        catch (error) {
+
+            if (error) {
+                console.log(unitTestsMethods[i] + ' failed.\n' + error);
+            }
+        }
     }
-    
-    console.log('All unit tests succeeded');
 } ());

@@ -132,179 +132,146 @@
             // throw an error if list is empty
             throw new Error('No node to delete');
         },
-
-        // inserts node by crawling from front of list
-        _insertFromLeft: function (newNode, position) {
-
+        
+        _searchFromLeft: function (position) {
+            
             // start crawling from head
             var index = 1,
-                previous,
                 current = this.head;
 
             // crawl until position reached
             while (index < position) {
 
-                previous = current;
                 current = current.next;
                 index++;
             }
-
-            // insert newNode at position
-            previous.next = newNode;
-            newNode.previous = previous;
-            newNode.next = current;
-            current.previous = newNode;
-
-            this._size++;
-
-            return newNode;
-        },
-
-        // insert node by crawling from end of list
-        _insertFromRight: function (newNode, position) {
-
-            // start crawling from tail
-            var index = this._size,
-                next,
-                current = this.tail;
-
-            // crawl until position reached
-            while (index >= position) {
-
-                next = current;
-                current = current.previous;
-                index--;
-            }
-
-            // insert newNode at position
-            next.previous = newNode;
-            newNode.next = next;
-            newNode.previous = current;
-            current.next = newNode;
-
-            this._size++;
-
-            return newNode;
-        },
-
-        // insert node at specified position
-        insertAt: function (position, data) {
-
-            // if position is within bounds of list
-            if (position >= 1 && position <= this._size) {
-
-                // find middle of list to determine shortest way to insert newNode
-                var middle = Math.ceil(this._size / 2),
-                    newNode = new this.Node(data);
-
-                // if position is in first half of list
-                if (position <= middle) {
-
-                    // if position is 1, set head equal to newNode
-                    if (position === 1) {
-                        return this.insertLeft(data);
-                    }
-
-                    // insert node by crawling from front
-                    return this._insertFromLeft(newNode, position);
-                } 
-                else {
-                    
-                    // insert node by crawling from end
-                    return this._insertFromRight(newNode, position);
-                }
-            }
-
-            throw new Error('Position out of bounds');
-        },
-
-        // delete node by crawling from front of list
-        _deleteFromRight: function (position) {
-
-            // start crawling from head
-            var index = 1,
-                previous,
-                next,
-                current = this.head;
-
-            // crawl until position reached
-            while (index < position) {
-
-                previous = current;
-                current = current.next;
-                next = current.next;
-                index++;
-            }
-
-            // delete current node
-            previous.next = next;
-            next.previous = previous;
-
-            this._size--;
-
+            
             return current;
         },
-
-        // insert node by crawling from end of list
-        _deleteFromLeft: function (position) {
-
+        
+        _searchFromRight: function (position) {
+            
             // start crawling from tail
             var index = this._size,
-                previous,
-                next,
                 current = this.tail;
 
             // crawl until position reached
             while (index > position) {
-
-                next = current;
+                
                 current = current.previous;
-                previous = current.previous;
                 index--;
             }
-
-            // delete current node
-            next.previous = previous;
-            previous.next = next;
-
-            this._size--;
-
+            
             return current;
         },
-
-        // insert node at specified position
-        deleteAt: function (position) {
-
+        
+        searchAt: function (position) {
+          
             // if position is within bounds of list
-            if (this._size > 0 && position >= 1 && position <= this._size) {
+            if (position >= 1 && position <= this._size) {
 
-                // find middle of list to determine shortest way to delete node at position
+                // find middle of list to determine shortest way to search
                 var middle = Math.ceil(this._size / 2);
 
                 // if position is in first half of list
                 if (position <= middle) {
-
-                    // if position is 1, set head equal to newNode
-                    if (position === 1) {
-                        return this.deleteLeft();
-                    }
-
-                    // delete node by crawling from front
-                    return this._deleteFromLeft(position);
+                    // search by crawling from front
+                    return this._searchFromLeft(position);
                 } 
                 else {
-
-                    // if position is tail, set tail equal to newNode
-                    if (position === this._size) {
-                        return this.deleteRight();
-                    }
-
-                    // delete node by crawling from end
-                    return this._deleteFromRight(position);
+                    // search by crawling from end
+                    return this._searchFromRight(position);
                 }
             }
 
             throw new Error('Position out of bounds');
+        },
+        
+        _makeActionAt: function (action) {
+        
+            return function (position, data) {
+                
+                // if position is within bounds of list
+                if (position >= 1 && position <= this._size) {
+
+                    // find middle of list to determine shortest way to access node
+                    var middle = Math.ceil(this._size / 2),
+                        newNode,
+                        previous,
+                        current,
+                        next;
+                    
+                    if (action === 'insert') {
+                        newNode = new this.Node(data);
+                    }
+
+                    // if position is in first half of list
+                    if (position <= middle) {
+
+                        // if position is 1, set head equal to newNode
+                        if (position === 1) {
+                            if (action === 'insert') {
+                                return this.insertLeft(data);
+                            }
+
+                            if (action === 'delete') {
+                                return this.deleteLeft();
+                            }
+                        }
+
+                        current = this._searchFromLeft(position);
+                    } 
+                    else {
+                        
+                        if (position === this._size && action === 'delete') {
+                            return this.deleteRight();
+                        }
+                        
+                        current = this._searchFromRight(position);
+                    }
+
+                    if (action === 'insert') {
+                        
+                        previous = current.previous;
+                        
+                        // insert newNode at position
+                        previous.next = newNode;
+                        current.previous = newNode;
+                        newNode.previous = previous;
+                        newNode.next = current;
+                        
+                        this._size++;
+                        return newNode;
+                    }
+
+                    if (action === 'delete') {
+                    
+                        previous = current.previous;
+                        next = current.next;
+
+                        // delete current node
+                        next.previous = previous;
+                        previous.next = next;
+                        
+                        this._size--;
+                        return current;
+                    }
+                }
+
+                throw new Error('Position out of bounds');
+            };
+        },
+
+        // insert node at specified position
+        insertAt: function (position, data) {
+            
+            this._makeActionAt('insert').call(this,position,data);
+        },
+
+        // insert node at specified position
+        deleteAt: function (position, data) {
+            
+            this._makeActionAt('delete').call(this,position);
         },
 
         // delete first node found containing the specified data
@@ -418,6 +385,70 @@
 
             this.head = this.tail = null;
             this._size = 0;
+        },
+        
+        _swap: function (positionLeft, positionRight) {
+            
+            var positions = {Left: positionLeft, Right: positionRight},
+                positionKeys = Object.keys(positions),
+                container = {};
+            
+            for (var i = 0; i < positionKeys.length; i++) {
+                
+                var side = positionKeys[i];
+                
+                container['current' + side] = this.searchAt(positions[side]);
+                container['previous' + side] = container['current' + side].previous;
+                container['next' + side] = container['current' + side].next;
+            }
+            
+            if (container.previousLeft !== null) {
+                container.previousLeft.next = container.currentRight;
+            }
+            
+            if (container.nextRight !== null) {
+                container.nextRight.previous = container.currentLeft;
+            }
+            
+            if (container.previousLeft === null && container.nextRight === null) {
+                
+                this.head  = container.currentRight;
+                this.tail = container.currentLeft;
+            }
+
+            if (container.currentLeft === container.previousRight && container.currentRight === container.nextLeft) {
+
+                container.currentLeft.previous = container.currentRight;
+                container.currentRight.next = container.currentLeft;
+            }
+            else {
+
+                container.currentLeft.previous = container.previousRight;
+                container.currentRight.next = container.nextLeft;
+
+                container.nextLeft.previous = container.currentRight;
+                container.previousRight.next = container.currentLeft;
+            }
+
+            container.currentLeft.next = container.nextRight;
+            container.currentRight.previous = container.previousLeft;
+        },
+        
+        reverse: function () {
+            
+            var indexLeft = 1,
+                indexRight = this._size;
+            
+            while (indexLeft < indexRight) {
+                
+                this._swap(indexLeft, indexRight);
+                
+                indexLeft++;
+                indexRight --;
+            }
+        },
+        
+        reversed: function () {
         }
     };
     
