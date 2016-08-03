@@ -7,16 +7,8 @@
             midIndex;
         
         // if minIdex and maxIndex are specified in the function arguments, use them
-        if (arguments[2] !== undefined && arguments[3] !== undefined) {
-            
-            minIndex = arguments[2];
-            maxIndex = arguments[3];
-        } 
-        else {
-            
-            minIndex = 0;
-            maxIndex = arrSorted.length - 1;
-        }
+        minIndex = typeof arguments[2] === 'number' ? arguments[2] : 0;
+        maxIndex = typeof arguments[3] === 'number' ? arguments[3] : arrSorted.length - 1;
         
         // if valueSearched is not in arraySorted, return -1
         if (valueSearched < arrSorted[minIndex] || valueSearched > arrSorted[maxIndex]) {

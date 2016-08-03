@@ -65,8 +65,15 @@
     
     for (var i = 0; i < unitTestsMethods.length; i++) {
         
-         unitTests[unitTestsMethods[i]]();
-    }
-    
-    console.log('All unit tests succeeded');
+        try {
+            unitTests[unitTestsMethods[i]]();
+            console.log(unitTestsMethods[i] + ' OK');
+        }
+        catch (error) {
+
+            if (error) {
+                console.log(unitTestsMethods[i] + ' failed.\n' + error);
+            }
+        }
+    };
 } ());
